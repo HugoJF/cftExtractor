@@ -6,271 +6,75 @@ import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
 import java.awt.Rectangle;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 
 /**
- * Extract features from an image ROI based on Image Moments calculated for each cell of grid imposed on the ROI
+ * Extract features from an image ROI based on Image Moments calculated for each
+ * cell of grid imposed on the ROI
  */
 public class CoOcorrenceMatrixExtractor extends Extractor {
 	private final int anguloI = 0;
 	private final int anguloF = 360;
-	private final int anguloInc = 10;
+	private final int anguloInc = 60;
 	private final int distanciaInc = 1;
+	private static Logger LOGGER = Logger.getLogger(Extractor.class);
 
 	private double[] entr, corr, diss, cont, asm, inv, idm;
 
-	private static HashSet<String> attributeNames = new HashSet<String>(Arrays.asList("ENTR360", "ENTR315", "ENTR270", "ENTR225", "ENTR180", "ENTR135", "ENTR90", "ENTR45", "CORR360", "CORR315", "CORR270", "CORR225", "CORR180", "CORR135", "CORR90", "CORR45", "DISS360", "DISS315", "DISS270", "DISS225", "DISS180", "DISS135", "DISS90", "DISS45", "CONT360", "CONT315", "CONT270", "CONT225", "CONT180", "CONT135", "CONT90", "CONT45", "ASM360", "ASM315", "ASM270", "ASM225", "ASM180", "ASM135", "ASM90", "ASM45", "INV360", "INV315", "INV270", "INV225", "INV180", "INV135", "INV90", "INV45", "IDM360", "IDM315", "IDM270", "IDM225", "IDM180", "IDM135", "IDM90", "IDM45"));
+	//private static HashSet<String> attributeNames = new HashSet<String>(Arrays.asList("ENTR360", "ENTR315", "ENTR270", "ENTR225", "ENTR180", "ENTR135", "ENTR90", "ENTR45", "CORR360", "CORR315", "CORR270", "CORR225", "CORR180", "CORR135", "CORR90", "CORR45", "DISS360", "DISS315", "DISS270", "DISS225", "DISS180", "DISS135", "DISS90", "DISS45", "CONT360", "CONT315", "CONT270", "CONT225", "CONT180", "CONT135", "CONT90", "CONT45", "ASM360", "ASM315", "ASM270", "ASM225", "ASM180", "ASM135", "ASM90", "ASM45", "INV360", "INV315", "INV270", "INV225", "INV180", "INV135", "INV90", "INV45", "IDM360", "IDM315", "IDM270", "IDM225", "IDM180", "IDM135", "IDM90", "IDM45"));
 
-	public double extractENTR360() {
-		return getENTR(360);
+	public static HashSet<String> attributePrefixes = new HashSet<String>(Arrays.asList("ENTR", "CORR", "DISS", "CONT", "ASM", "INV", "IDM"));
+
+	@Override
+	public void extract(List<String> attributesNames, List<Double> attributes) {
+		Method method;
+
+		for (String attribute : getAtributtesNames()) {
+			for (String prefix : attributePrefixes) {
+				if (attributesNames.contains(attribute) && attribute.startsWith(prefix)) {
+					try {
+						method = this.getClass().getDeclaredMethod("get".concat(prefix), new Class[] {Integer.class});
+						method.setAccessible(Boolean.TRUE);
+						Double value = (Double) method.invoke(this, new Object[] {Integer.valueOf(attribute.substring(prefix.length()))});
+						attributes.add(value);
+					} catch (Exception e) {
+						LOGGER.error("Ocorreu algum erro ao invocar o extrator para o atirbuto ".concat(attribute), e);
+					}
+				}
+			}
+		}
 	}
 
-	public double extractENTR315() {
-		return getENTR(315);
-	}
-
-	public double extractENTR270() {
-		return getENTR(270);
-	}
-
-	public double extractENTR225() {
-		return getENTR(225);
-	}
-
-	public double extractENTR180() {
-		return getENTR(180);
-	}
-
-	public double extractENTR135() {
-		return getENTR(135);
-	}
-
-	public double extractENTR90() {
-		return getENTR(90);
-	}
-
-	public double extractENTR45() {
-		return getENTR(45);
-	}
-
-	public double extractCORR360() {
-		return getCORR(360);
-	}
-
-	public double extractCORR315() {
-		return getCORR(315);
-	}
-
-	public double extractCORR270() {
-		return getCORR(270);
-	}
-
-	public double extractCORR225() {
-		return getCORR(225);
-	}
-
-	public double extractCORR180() {
-		return getCORR(180);
-	}
-
-	public double extractCORR135() {
-		return getCORR(135);
-	}
-
-	public double extractCORR90() {
-		return getCORR(90);
-	}
-
-	public double extractCORR45() {
-		return getCORR(45);
-	}
-
-	public double extractDISS360() {
-		return getDISS(360);
-	}
-
-	public double extractDISS315() {
-		return getDISS(315);
-	}
-
-	public double extractDISS270() {
-		return getDISS(270);
-	}
-
-	public double extractDISS225() {
-		return getDISS(225);
-	}
-
-	public double extractDISS180() {
-		return getDISS(180);
-	}
-
-	public double extractDISS135() {
-		return getDISS(135);
-	}
-
-	public double extractDISS90() {
-		return getDISS(90);
-	}
-
-	public double extractDISS45() {
-		return getDISS(45);
-	}
-
-	public double extractCONT360() {
-		return getCONT(360);
-	}
-
-	public double extractCONT315() {
-		return getCONT(315);
-	}
-
-	public double extractCONT270() {
-		return getCONT(270);
-	}
-
-	public double extractCONT225() {
-		return getCONT(225);
-	}
-
-	public double extractCONT180() {
-		return getCONT(180);
-	}
-
-	public double extractCONT135() {
-		return getCONT(135);
-	}
-
-	public double extractCONT90() {
-		return getCONT(90);
-	}
-
-	public double extractCONT45() {
-		return getCONT(45);
-	}
-
-	public double extractASM360() {
-		return getASM(360);
-	}
-
-	public double extractASM315() {
-		return getASM(315);
-	}
-
-	public double extractASM270() {
-		return getASM(270);
-	}
-
-	public double extractASM225() {
-		return getASM(225);
-	}
-
-	public double extractASM180() {
-		return getASM(180);
-	}
-
-	public double extractASM135() {
-		return getASM(135);
-	}
-
-	public double extractASM90() {
-		return getASM(90);
-	}
-
-	public double extractASM45() {
-		return getASM(45);
-	}
-
-	public double extractINV360() {
-		return getINV(360);
-	}
-
-	public double extractINV315() {
-		return getINV(315);
-	}
-
-	public double extractINV270() {
-		return getINV(270);
-	}
-
-	public double extractINV225() {
-		return getINV(225);
-	}
-
-	public double extractINV180() {
-		return getINV(180);
-	}
-
-	public double extractINV135() {
-		return getINV(135);
-	}
-
-	public double extractINV90() {
-		return getINV(90);
-	}
-
-	public double extractINV45() {
-		return getINV(45);
-	}
-
-	public double extractIDM360() {
-		return getIDM(360);
-	}
-
-	public double extractIDM315() {
-		return getIDM(315);
-	}
-
-	public double extractIDM270() {
-		return getIDM(270);
-	}
-
-	public double extractIDM225() {
-		return getIDM(225);
-	}
-
-	public double extractIDM180() {
-		return getIDM(180);
-	}
-
-	public double extractIDM135() {
-		return getIDM(135);
-	}
-
-	public double extractIDM90() {
-		return getIDM(90);
-	}
-
-	public double extractIDM45() {
-		return getIDM(45);
-	}
-
-	private double getENTR(int angle) {
+	public double getENTR(Integer angle) {
 		return entr[angle / anguloInc];
 	}
 
-	private double getCORR(int angle) {
+	public double getCORR(Integer angle) {
 		return corr[angle / anguloInc];
 	}
 
-	private double getDISS(int angle) {
+	public double getDISS(Integer angle) {
 		return diss[angle / anguloInc];
 	}
 
-	private double getCONT(int angle) {
+	public double getCONT(Integer angle) {
 		return cont[angle / anguloInc];
 	}
 
-	private double getASM(int angle) {
+	public double getASM(Integer angle) {
 		return asm[angle / anguloInc];
 	}
 
-	private double getINV(int angle) {
+	public double getINV(Integer angle) {
 		return inv[angle / anguloInc];
 	}
 
-	private double getIDM(int angle) {
+	public double getIDM(Integer angle) {
 		return idm[angle / anguloInc];
 	}
 
@@ -554,7 +358,13 @@ public class CoOcorrenceMatrixExtractor extends Extractor {
 
 	@Override
 	public HashSet<String> getAtributtesNames() {
-		return attributeNames;
+		HashSet<String> atts = new HashSet<String>();
+		for (int i = getanguloF(); i > getanguloI(); i -= getanguloInc()) {
+			for(String prefix : attributePrefixes) {
+				atts.add(prefix.concat(String.valueOf(i)));
+			}
+		}
+		return atts;
 	}
 
 }

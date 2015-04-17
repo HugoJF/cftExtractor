@@ -29,10 +29,10 @@ public class Main {
 		
 		// TODO Auto-generated method stub
 
-		//XMLConfigReader xmlcr = new XMLConfigReader(new FileInputStream("default_configuration.xml"));
-		//final Configuration configuration = xmlcr.read();
+		XMLConfigReader xmlcr = new XMLConfigReader(new FileInputStream("default_configuration.xml"));
+		final Configuration configuration = xmlcr.read();
 		
-		final Configuration configuration = new Configuration(true, true, true, true, 10, true, true);
+		//final Configuration configuration = new Configuration(true, true, true, true, 60, true, true);
 
 		String name = "polen23e+cft";
 
