@@ -21,9 +21,9 @@ import cftExtractor.extractors.WaveletExtractor;
 import cftExtractor.extractors.executers.ImageSetExtractorExecutor;
 import cftExtractor.models.ImageSet;
 
-public class Main {
+public class CftExtractor {
 
-	private static Logger LOGGER = Logger.getLogger(Main.class);
+	private static Logger LOGGER = Logger.getLogger(CftExtractor.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
 		
@@ -71,6 +71,45 @@ public class Main {
 		}
 		LOGGER.info("Processo finalizado");
 
+	}
+	
+	public Instances getInstances(String name, String imageSetPath) {
+
+		//final Configuration configuration = new Configuration(true, true, true, true, 60, true, true);
+
+		XMLConfigReader xmlcr = null;
+		try {
+			xmlcr = new XMLConfigReader(new FileInputStream("default_configuration.xml"));
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		final Configuration configuration = xmlcr.read();
+		
+		
+
+		ImageSetExtractorExecutor extractorExecutor = new ImageSetExtractorExecutor(name) {
+
+			@Override
+			public void setExtractors(List<Extractor> extractors) {
+				extractors.add(new ColorExtractor());
+				extractors.add(new FormExtractor());
+				extractors.add(new CoOcorrenceMatrixExtractor());
+				extractors.add(new LBPExtractor());
+				extractors.add(new WaveletExtractor());
+			}
+
+			@Override
+			public void setAttributes(List<String> attributes) {
+				attributes.addAll(configuration.getAttributes());
+			}
+		};
+		
+		ImageSet imageSet = new ImageSet(imageSetPath);
+
+		Instances instances = extractorExecutor.execute(imageSet);
+		
+		return instances;
 	}
 
 }
