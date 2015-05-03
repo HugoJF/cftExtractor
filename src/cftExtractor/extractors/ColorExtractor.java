@@ -25,33 +25,6 @@ public class ColorExtractor extends Extractor {
 	private static Logger LOGGER = Logger.getLogger(ColorExtractor.class);
 	private static HashSet<String> attributeNames = new HashSet<String>(Arrays.asList("RGB_R", "RGB_G", "RGB_B", "HSB_H", "HSB_S", "HSB_B"));
 
-	private double[] rgb, hsb;
-	
-	public double extractRGB_R() {
-		return rgb[RGB_R];
-	}
-
-	public double extractRGB_G() {
-		return rgb[RGB_G];
-	}
-
-	public double extractRGB_B() {
-		return rgb[RGB_B];
-	}
-
-	public double extractHSB_H() {
-		return hsb[HSB_H];
-	}
-
-	public double extractHSB_S() {
-		return hsb[HSB_S];
-	}
-
-	public double extractHSB_B() {
-		return hsb[HSB_B];
-	}
-
-
 	/**
 	 * Method responsible for extract the RGB channels from image
 	 * 
@@ -116,8 +89,10 @@ public class ColorExtractor extends Extractor {
 
 	@Override
 	public void extractAttributes() {
+		double[] rgb, hsb;
 		rgb = captureRGBPixels(this.image.getProcessor());
 		hsb = captureHSBPixels(this.image.getProcessor());
+		
 	}
 
 	// TODO Remover
